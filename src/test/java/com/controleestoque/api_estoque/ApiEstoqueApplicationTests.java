@@ -1,10 +1,10 @@
-package com.falkun.estoque;
+package com.controleestoque.api_estoque;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EstoqueApplicationTests {
+class ApiEstoqueApplicationTests {
 
 	@Test
 	void contextLoads() {
