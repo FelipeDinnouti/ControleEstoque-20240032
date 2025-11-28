@@ -13,15 +13,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
+// A sale is an abstract object to define some sale of any ammount of goods of any type. Each sale item (ItemVenda) is some product and its ammount.
+
 @Entity
-@Table(name = "tb_clientes")
+@Table(name = "tb_venda")
 public class Venda {  
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @ManyToOne
-    @JoinColumn(name = "cliente")
+    @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
     @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Table;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 
 @Entity
@@ -20,7 +19,6 @@ public class Cliente {
     private Long id;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
-    @JoinColumn(name = "vendas_id", nullable = false)
     private List<Venda> vendas = new ArrayList<Venda>();
 
     public Cliente() {}
@@ -40,5 +38,9 @@ public class Cliente {
     public void removeVenda(Venda venda) {
         vendas.remove(venda);
         venda.setCliente(null);
+    }
+
+    public List<Venda> getVendas() {
+        return this.vendas;
     }
 }

@@ -3,6 +3,8 @@ package com.controleestoque.api_estoque.model;
 import java.math.BigDecimal;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
@@ -28,10 +30,11 @@ public class Produto {
     private BigDecimal preco;
 
     @OneToOne(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private Estoque estoque;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoria_id", nullable = false)
+    @JoinColumn(name = "categoria", nullable = false)
     private Categoria categoria;
 
     @ManyToMany
@@ -44,12 +47,10 @@ public class Produto {
 
     public Produto() {}
 
-    public Produto(String nome, BigDecimal preco, Estoque estoque, Categoria categoria, Set<Fornecedor> fornecedores) {
+    public Produto(String nome, BigDecimal preco, Estoque estoque, Categoria categoria) {
         this.nome = nome;
         this.preco = preco;
         this.estoque = estoque;
-        this.categoria = categoria;
-        this.fornecedores = fornecedores;
     }
 
     public Long getId() { return id; }

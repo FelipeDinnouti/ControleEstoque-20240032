@@ -1,5 +1,7 @@
 package com.controleestoque.api_estoque.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GenerationType;
@@ -8,6 +10,9 @@ import jakarta.persistence.Table;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.FetchType;
+
+// I hate this assignment
+// The stock class will be created together with the product class (since these classes makes no absolute sense why should this?)
 
 @Entity
 @Table(name = "tb_estoques")
@@ -21,6 +26,7 @@ public class Estoque {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "produto_id", nullable = false)
+    @JsonBackReference
     private Produto produto;
 
     public Estoque() {}

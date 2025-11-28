@@ -2,6 +2,8 @@ package com.controleestoque.api_estoque.model;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GenerationType;
@@ -13,7 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 
 @Entity
-@Table(name = "tb_clientes")
+@Table(name = "tb_item_venda")
 @Getter
 @Setter
 public class ItemVenda {  
@@ -23,6 +25,7 @@ public class ItemVenda {
 
     @ManyToOne
     @JoinColumn(name = "venda_id")
+    @JsonIgnore
     private Venda venda;
 
     @ManyToOne

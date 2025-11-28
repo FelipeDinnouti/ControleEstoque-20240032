@@ -28,5 +28,4 @@ public class Fornecedor {
     public void setNome(String nome) { this.nome = nome; }
     public Set<Produto> getProdutos() { return produtos; }
     public void setProdutos(Set<Produto> produtos) { this.produtos = produtos; }
-
 }

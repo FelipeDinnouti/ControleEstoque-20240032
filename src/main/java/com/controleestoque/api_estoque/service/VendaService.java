@@ -1,3 +1,5 @@
+package com.controleestoque.api_estoque.service;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +16,9 @@ import com.controleestoque.api_estoque.model.Venda;
 import com.controleestoque.api_estoque.repository.ClienteRepository;
 import com.controleestoque.api_estoque.repository.ProdutoRepository;
 import com.controleestoque.api_estoque.repository.VendaRepository;
+import com.controleestoque.api_estoque.utils.exceptions.BadRequestException;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 
@@ -25,31 +29,49 @@ public class VendaService {
     private final VendaRepository vendaRepository;
     private final ClienteRepository clienteRepository;
     private final ProdutoRepository produtoRepository;
+    private final EstoqueService estoqueService;
 
+    public static VendaResponse makeVendaResponse(Venda venda) {
+        List<ItemVenda> itemVendaList = venda.getItens();
+        List<ItemVendaResponse> serialized = new ArrayList<ItemVendaResponse>();
+
+        // Transform ItemVenda into ItemVendaResponse (DTO form again)
+        for (ItemVenda itemVenda : itemVendaList ) {
+            serialized.add(new ItemVendaResponse(itemVenda.getId(), itemVenda.getProduto().getId(), itemVenda.getQuantidade(), itemVenda.getPrecoUnitario()));
+        }
+
+        return new VendaResponse(venda.getId(), venda.getCliente().getId(), serialized);
+    }
+
+    
+    @Transactional // This annotation basically implements roll back
     public VendaResponse criarVenda(CreateVendaRequest dto) {
-
-        Cliente cliente = clienteRepository.findById(dto.clienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        Cliente cliente = clienteRepository.findById(dto.getClienteId())
+                .orElseThrow(() -> new BadRequestException("Cliente não encontrado"));
 
         Venda venda = new Venda(cliente);
 
-        for (ItemVendaRequest itemDto : dto.itens()) {
-
-            Produto produto = produtoRepository.findById(itemDto.produtoId())
-                    .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-
+        for (ItemVendaRequest itemDto : dto.getItens()) {
+        
+            // Make sure the products specified exists
+            Produto produto = produtoRepository.findById(itemDto.getProdutoId())
+                    .orElseThrow(() -> new BadRequestException("Produto não encontrado"));
+            
+            // Make each sale item
             ItemVenda item = new ItemVenda();
             item.setProduto(produto);
             item.setVenda(venda);
-            item.setQuantidade(itemDto.quantidade());
+            item.setQuantidade(itemDto.getQuantidade());
             item.setPrecoUnitario(produto.getPreco());
 
+            // Update stock of item
+            estoqueService.changeStock(item.getProduto().getId(), -item.getQuantidade()); // Throws an exception if there isn't enough stock
+           
             venda.getItens().add(item); // owning side is updated by the setters
         }
 
         Venda saved = vendaRepository.save(venda);
-
-        return toResponse(saved);
+        return makeVendaResponse(saved);
     }
 
     public List<VendaResponse> listarVendas() {
@@ -59,18 +81,17 @@ public class VendaService {
         
         // Transform Venda into VendaResponse (it's DTO form)
         for (Venda venda : data) {
-            List<ItemVenda> itemVendaList = venda.getItens();
-            List<ItemVendaResponse> serialized = new ArrayList<ItemVendaResponse>();
-
-            // Transform ItemVenda into ItemVendaResponse (DTO form again)
-            for (ItemVenda itemVenda : itemVendaList ) {
-                serialized.add(new ItemVendaResponse(itemVenda.getId(), itemVenda.getProduto().getId(), itemVenda.getQuantidade(), itemVenda.getPrecoUnitario()));
-            }
-
-            VendaResponse resObject = new VendaResponse(venda.getId(), venda.getCliente().getId(), serialized);
-            res.add(resObject);
+            res.add(makeVendaResponse(venda));
         }
  
         return res;
+    }
+
+    public boolean deleteVenda(Long id) {
+        vendaRepository.findById(id).orElseThrow(() -> new BadRequestException("Essa venda não existe"));
+
+        vendaRepository.deleteById(id);
+
+        return true;
     }
 }

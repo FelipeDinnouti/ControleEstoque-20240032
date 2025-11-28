@@ -1,6 +1,5 @@
 package com.controleestoque.api_estoque.dto;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +7,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class CreateVendaRequest {
-    Long clienteId;
-    List<ItemVendaRequest> itens;
+public class ChangeEstoqueRequest {
+    private Integer quantidade;
+
+    public Integer getQuantidade() {
+        return quantidade;
+    }
 }
