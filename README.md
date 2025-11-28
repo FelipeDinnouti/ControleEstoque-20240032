@@ -13,7 +13,6 @@ E então, mais nenhuma dependência é necessária e se roda o projeto com o seg
 ./mvnw spring-boot:run
 ```
 
-**
-Vídeo explicativo:**
+**Vídeo explicativo:**
 
 https://drive.google.com/file/d/1rni2G9-g7uqOhaP0qSkwWhcHfCklWrbu/view?usp=sharing
